@@ -1,46 +1,39 @@
-name: Build MPlayer for iOS
+name: Build for iOS with Clang 15
 
 on:
-  workflow_dispatch:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: macos-latest
 
     steps:
-    - name: Checkout source
+    - name: Checkout repo
       uses: actions/checkout@v3
 
-    - name: Install dependencies
+    - name: Install LLVM 15
       run: |
-        brew install automake libtool pkg-config llvm@15
+        brew install llvm@15
+        echo "LLVM_PATH=$(brew --prefix llvm@15)" >> $GITHUB_ENV
 
-    - name: Set LLVM 15 as default
+    - name: Check Clang version
       run: |
-        echo 'export PATH="/opt/homebrew/opt/llvm@15/bin:$PATH"' >> $GITHUB_ENV
-        echo 'export CC=clang' >> $GITHUB_ENV
-
-    - name: Patch configure script
-      run: |
-        sed -i '' 's/cc_check="no"/cc_check="yes"/' configure || true
+        $LLVM_PATH/bin/clang --version
 
     - name: Configure for iOS
       run: |
         export SDK=$(xcrun --sdk iphoneos --show-sdk-path)
+        export CC="$LLVM_PATH/bin/clang"
+        export CFLAGS="-isysroot $SDK -arch armv7"
         ./configure \
           --disable-gui \
           --disable-mencoder \
           --enable-static \
-          --cc="clang -isysroot $SDK -arch armv7"
+          --cc="$CC $CFLAGS"
 
-    - name: Build MPlayer
-      run: make -j$(sysctl -n hw.ncpu)
-
-    - name: List build output
-      run: ls -lh
-
-    - name: Upload build artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: mplayer-ios
-        path: ./mplayer
+    - name: Build
+      run: |
+        make -j$(sysctl -n hw.logicalcpu)
