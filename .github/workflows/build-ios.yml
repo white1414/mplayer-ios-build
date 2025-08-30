@@ -20,12 +20,19 @@ jobs:
         export SDK=$(xcrun --sdk iphoneos --show-sdk-path)
         export CC="$(xcrun --sdk iphoneos -f clang)"
         ./configure \
-          --disable-gui \
-          --disable-libavcodec \
-          --disable-libavformat \
-          --disable-libavutil \
-          --enable-static \
-          --cc="$CC -isysroot $SDK -arch armv7"
+        --disable-ffmpeg \
+        --disable-mencoder \
+        --disable-libav \
+        --disable-libavdevice \
+        --disable-libavfilter \
+        --disable-libpostproc \
+        --disable-libswscale \
+        --disable-libavformat \
+        --disable-libavcodec \
+        --disable-libavutil \
+        --disable-gui \
+        --enable-static \
+        --cc="$CC -isysroot $SDK -arch armv7"
 
     - name: Build MPlayer
       run: |
