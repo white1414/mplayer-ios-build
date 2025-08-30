@@ -67,9 +67,9 @@ compile_check() {
   return "$TMPRES"
 }
 
-#cc_check() {
-#  compile_check $TMPC $@
-#}
+cc_check() {
+  compile_check $TMPC $@
+}
 
 cxx_check() {
   compile_check $TMPCPP $@ -lstdc++
