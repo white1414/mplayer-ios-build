@@ -13,21 +13,28 @@ jobs:
 
     - name: Install dependencies
       run: |
-        brew install automake libtool pkg-config
+        brew install automake libtool pkg-config llvm@15
+
+    - name: Set LLVM 15 as default
+      run: |
+        echo 'export PATH="/opt/homebrew/opt/llvm@15/bin:$PATH"' >> $GITHUB_ENV
+        echo 'export CC=clang' >> $GITHUB_ENV
+
+    - name: Patch configure script
+      run: |
+        sed -i '' 's/cc_check="no"/cc_check="yes"/' configure || true
 
     - name: Configure for iOS
       run: |
         export SDK=$(xcrun --sdk iphoneos --show-sdk-path)
-        export CC="$(xcrun --sdk iphoneos -f clang)"
         ./configure \
           --disable-gui \
           --disable-mencoder \
           --enable-static \
-          --cc="$CC -isysroot $SDK -arch armv7"
+          --cc="clang -isysroot $SDK -arch armv7"
 
     - name: Build MPlayer
-      run: |
-        make -j$(sysctl -n hw.ncpu)
+      run: make -j$(sysctl -n hw.ncpu)
 
     - name: List build output
       run: ls -lh
