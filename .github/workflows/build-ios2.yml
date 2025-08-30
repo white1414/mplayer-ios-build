@@ -1,0 +1,39 @@
+name: Build for iOS with Clang 15
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Install LLVM 15
+      run: |
+        brew install llvm@15
+        echo "LLVM_PATH=$(brew --prefix llvm@15)" >> $GITHUB_ENV
+
+    - name: Check Clang version
+      run: |
+        $LLVM_PATH/bin/clang --version
+
+    - name: Configure for iOS
+      run: |
+        export SDK=$(xcrun --sdk iphoneos --show-sdk-path)
+        export CC="$LLVM_PATH/bin/clang"
+        export CFLAGS="-isysroot $SDK -arch armv7"
+        ./configure \
+          --disable-gui \
+          --disable-mencoder \
+          --enable-static \
+          --cc="$CC $CFLAGS"
+
+    - name: Build
+      run: |
+        make -j$(sysctl -n hw.logicalcpu)
