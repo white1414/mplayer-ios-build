@@ -1,0 +1,32 @@
+name: Build MPlayer for iOS
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Install dependencies
+      run: |
+        brew install automake libtool pkg-config ffmpeg
+
+    - name: Configure for iOS
+      run: |
+        export SDK=$(xcrun --sdk iphoneos --show-sdk-path)
+        export CC="$(xcrun --sdk iphoneos -f clang)"
+        ./configure --host=arm-apple-darwin --disable-gui --enable-static CC="$CC" --extra-cflags="-isysroot $SDK -arch armv7"
+
+    - name: Build MPlayer
+      run: |
+        make -j$(sysctl -n hw.ncpu)
+
+    - name: Upload binary
+      uses: actions/upload-artifact@v3
+      with:
+        name: mplayer-ios
+        path: ./mplayer
