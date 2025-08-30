@@ -21,7 +21,6 @@ jobs:
         export CC="$(xcrun --sdk iphoneos -f clang)"
         ./configure \
           --disable-gui \
-          --disable-ffmpeg \
           --disable-libavcodec \
           --disable-libavformat \
           --disable-libavutil \
