@@ -17,7 +17,7 @@ jobs:
 
     - name: Install LLVM 15
       run: |
-        brew install llvm@15
+        brew install llvm@15 rtc
         echo "LLVM_PATH=$(brew --prefix llvm@15)" >> $GITHUB_ENV
 
     - name: Check Clang version
