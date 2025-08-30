@@ -16,11 +16,13 @@ jobs:
         brew install automake libtool pkg-config ffmpeg
 
     - name: Configure for iOS
-      run: |
-        export SDK=$(xcrun --sdk iphoneos --show-sdk-path)
-        export CC="$(xcrun --sdk iphoneos -f clang)"
-        ./configure --host=arm-apple-darwin --disable-gui --enable-static CC="$CC" --extra-cflags="-isysroot $SDK -arch armv7"
-
+  run: |
+    export SDK=$(xcrun --sdk iphoneos --show-sdk-path)
+    export CC="$(xcrun --sdk iphoneos -f clang)"
+    ./configure \
+      --disable-gui \
+      --enable-static \
+      --cc="$CC -isysroot $SDK -arch armv7"
     - name: Build MPlayer
       run: |
         make -j$(sysctl -n hw.ncpu)
