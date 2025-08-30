@@ -9,26 +9,31 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Install dependencies
       run: |
-        brew install automake libtool pkg-config ffmpeg
+        brew install automake libtool pkg-config 
         
     - name: Configure for iOS
       run: |
         export SDK=$(xcrun --sdk iphoneos --show-sdk-path)
+        export MIN_IOS_VERSION=5.1.1
+        export CFLAGS="-isysroot $SDK -arch armv7 -miphoneos-version-min=$MIN_IOS_VERSION"
         export CC="$(xcrun --sdk iphoneos -f clang)"
         ./configure \
-          --disable-gui \  --disable-ffmpeg --disable-libavcodec --disable-libavformat --disable-libavutil
-
+          --disable-gui \  
+          --disable-ffmpeg --disable-libavcodec --disable-libavformat --disable-libavutil
           --enable-static \
           --cc="$CC -isysroot $SDK -arch armv7"
       
     - name: Build MPlayer
       run: |
         make -j$(sysctl -n hw.ncpu)
-
+        
+    - name: List build output
+      run: ls -R
+    
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
