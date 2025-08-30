@@ -30,6 +30,7 @@ jobs:
         export CC="$LLVM_PATH/bin/clang"
         export CFLAGS="-isysroot $SDK -arch armv7"
         ./configure \
+          --disable-fribidi \
           --disable-gui \
           --disable-mencoder \
           --enable-static \
