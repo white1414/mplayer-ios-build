@@ -6331,7 +6331,6 @@ echocheck "fribidi with charsets"
 if test "$_fribidi" = auto ; then
     cat > $TMPC << EOF
 #include <stdlib.h>
-#include <fribidi/fribidi.h>
 FriBidiParType test;
 int main(void) {
     if (fribidi_parse_charset("UTF-8") != FRIBIDI_CHAR_SET_UTF8)
