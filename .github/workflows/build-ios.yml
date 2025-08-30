@@ -14,6 +14,8 @@ jobs:
     - name: Install dependencies
       run: |
         brew install automake libtool pkg-config ffmpeg
+        brew link ffmpeg --force
+        brew install automake libtool pkg-config
 
     - name: Configure for iOS
       run: |
